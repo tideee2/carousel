@@ -121,6 +121,41 @@
           }
         }
       }
+    },
+    "angular-carousel-tidee": {
+      "root": "projects/angular-carousel-tidee",
+      "sourceRoot": "projects/angular-carousel-tidee/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/angular-carousel-tidee/tsconfig.lib.json",
+            "project": "projects/angular-carousel-tidee/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/angular-carousel-tidee/src/test.ts",
+            "tsConfig": "projects/angular-carousel-tidee/tsconfig.spec.json",
+            "karmaConfig": "projects/angular-carousel-tidee/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/angular-carousel-tidee/tsconfig.lib.json",
+              "projects/angular-carousel-tidee/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "angular-carousel-tideee"

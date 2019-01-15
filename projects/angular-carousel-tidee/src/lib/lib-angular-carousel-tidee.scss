@@ -1,0 +1,34 @@
+.carousel-main {
+  background: #656565;
+  margin: 0 auto;
+  border: 1px solid black;
+  display: flex;
+  //flex-direction: row;
+  width: 250px;
+  height: 80px;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 5px;
+
+  .el-container {
+    margin: 0 -5px;
+    background-color: #fff;
+    border-radius: 50%;
+    align-self: center;
+    transition: transform 0.5s;
+    &.activated {
+      z-index:20;
+      background-color: yellowgreen;
+      i {
+        font-size: 2.5rem;
+      }
+    }
+    i {
+      border:1px solid red;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      padding: 10px;
+      transition: font-size 0.5s;
+    }
+  }
+}
