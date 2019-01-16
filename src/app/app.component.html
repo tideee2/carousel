@@ -1,5 +1,10 @@
-<lib-angular-carousel-tidee
-  [elements]="entryArray"
-  (clickElement)="changeActive($event)"
-  [direction]="carouselDirection"
-></lib-angular-carousel-tidee>
+<div class="main">
+  <lib-angular-carousel-tidee
+    [elements]="entryArray"
+    (clickElement)="changeActive($event)"
+    [direction]="carouselDirection"
+  ></lib-angular-carousel-tidee>
+
+</div>
+<button (click)="carouselService.prev()">prev</button>
+<button (click)="carouselService.next()">next</button>
