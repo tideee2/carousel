@@ -3,8 +3,12 @@
     <div class="el-container" *ngFor="let el of elements; let num = index" (click)="elClick(el, num, singleElement)"
          [ngClass]="el.activated ? 'activated' : ''"
          [ngStyle]="{'filter': 'brightness(' + findOpacity(num)*100 + '%)'}"
+         [style.marginRight.px]="elementMargin"
+         [style.visibility]="el.visible ? 'visible' : 'hidden'"
          [style.zIndex]="findPosition(num)" data-id="{{el.id}}" #singleElement>
       <i class="fa" [ngClass]="el.icon" aria-hidden="true"></i>
     </div>
   </div>
 </div>
+
+<!--[style.marginLeft.px]="elementMargin"-->

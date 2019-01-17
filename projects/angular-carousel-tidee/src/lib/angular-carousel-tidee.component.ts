@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {AngularCarouselTideeService} from './angular-carousel-tidee.service';
 import {Subscription} from 'rxjs';
 
@@ -7,10 +7,11 @@ import {Subscription} from 'rxjs';
   templateUrl: './lib-angular-carousel-tidee.html',
   styleUrls: ['./lib-angular-carousel-tidee.scss']
 })
-export class AngularCarouselTideeComponent implements OnInit {
+export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
 
   @Input() elements: Array<any>;
   @Input() direction = '';
+  @Input() countPerFrame = 5;
   @Output() clickElement: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('carouselMain') carouselMain: ElementRef;
   @ViewChild('singleElement') singleElement: ElementRef;
@@ -18,8 +19,17 @@ export class AngularCarouselTideeComponent implements OnInit {
   // @todo remove magic numbers
   viewCount = 7;
   middleNum = 4;
-  leftShift = 45;
+  leftShift = 0;
   subscription: Subscription;
+  elementWidth = 150;
+  elementBaseHeight = 55;
+  elementMargin = -5;
+  frameNumber = 0;
+  middleX = 0;
+  magicMargin = 35;
+
+  ELEMENT_WIDTH = 50;
+
   constructor(public carouselService: AngularCarouselTideeService) {
     this.carouselService.prevClick$.subscribe(item => this.prevClick());
     this.carouselService.nextClick$.subscribe(item => this.nextClick());
@@ -28,17 +38,36 @@ export class AngularCarouselTideeComponent implements OnInit {
   ngOnInit() {
     this.subscription = this.carouselService.navItemNext$.subscribe(item => (item === 1) ? this.nextClick() : this.prevClick());
     // this.subscription = this.carouselService.navItemPrev$.subscribe(() => this.prevClick());
-
     console.log(this.getCenter());
     console.log(this.direction);
+    // this.elementWidth = this.carouselMain.nativeElement.clientWidth / this.countPerFrame;
+    this.elementWidth = 1 / this.countPerFrame * 100;
+    this.elementMargin = Math.floor(this.carouselMain.nativeElement.clientWidth / this.countPerFrame) - this.ELEMENT_WIDTH;
+    this.middleX = Math.floor(this.carouselMain.nativeElement.clientWidth / 2);
+    console.log(this.middleX);
+    console.log(this.elementWidth);
+    this.elements = this.elements.map((x, i) => {
+      // x.visible = i < this.countPerFrame;
+      x.visible = 1;
+      return x;
+    });
+
+  }
+
+  ngAfterViewInit() {
+    const w = document.querySelectorAll('.el-container');
+    console.log(w);
+    console.log(this.carouselMain.nativeElement.clientWidth / this.countPerFrame);
+    console.log(this.carouselMain.nativeElement.clientWidth);
+    console.log(this.elementMargin);
+    console.log(this.elements);
+    // this.elementWidth = this.carouselMain.nativeElement.clientWidth / this.countPerFrame;
+    // (w as any as Array<HTMLElement>).forEach(temp => temp.style.width = `${this.elementWidth}px`);
+
   }
 
   elClick(x, num, q) {
     console.log('---------');
-    // console.log(x.id, ':', num);
-    // console.log(q.clientWidth);
-    // console.log(this.carouselMain.nativeElement.clientWidth);
-    // console.log((q.clientWidth - 10) * this.elements.length);
 
     console.log(this.detectDirection(num));
 
@@ -54,7 +83,6 @@ export class AngularCarouselTideeComponent implements OnInit {
       // Property 'forEach' does not exist on type 'NodeListOf<Element>'
       // (tempEl as any as Array<HTMLElement>).forEach(temp => temp.style.transform = `translate(${this.leftShift}px)`);
       this.carouselMain.nativeElement.style.transform = `translateX(${this.leftShift}px)`;
-      // this.carouselMain.nativeElement.style.left = `${this.leftShift}px`;
     }
 
     this.getTranslateElement(q);
@@ -91,6 +119,10 @@ export class AngularCarouselTideeComponent implements OnInit {
     const activeNum = this.elements.findIndex(element => element.activated);
     if (activeNum + 1 < this.elements.length) {
       this.changeActiveElement(activeNum, 1);
+      if (activeNum - Math.floor(this.frameNumber / 2) > 0) {
+        this.leftShift = -Math.floor(this.ELEMENT_WIDTH + this.elementMargin) * activeNum + this.magicMargin;
+        this.carouselMain.nativeElement.style.transform = `translateX(${this.leftShift}px)`;
+      }
     }
   }
 
@@ -98,7 +130,14 @@ export class AngularCarouselTideeComponent implements OnInit {
     const activeNum = this.elements.findIndex(element => element.activated);
     if (activeNum > 0) {
       this.changeActiveElement(activeNum, -1);
+      if (activeNum + Math.floor(this.frameNumber / 2) < this.elements.length - 1) {
+        this.leftShift = -Math.floor(this.ELEMENT_WIDTH + this.elementMargin) * (activeNum - 1) + this.magicMargin;
+        this.carouselMain.nativeElement.style.transform = `translateX(${this.leftShift}px)`;
+      }
     }
+    // this.elements = this.elements.map((x, i) => {
+    //   x.visible = (this.frameNumber + i < this.countPerFrame) && (i > this.frameNumber) ;
+    // });
   }
 
   changeActiveElement(num: number, direction: number): void {

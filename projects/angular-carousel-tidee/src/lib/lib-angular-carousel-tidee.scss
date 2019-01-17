@@ -1,43 +1,52 @@
 .carousel-container {
-  position: relative;
+  //position: relative;
   height: 100%;
   overflow: hidden;
   .carousel-main {
+    //background-color: rgba(255, 0, 0, 0.38);
     transition: all 0.5s;
     //position: absolute;
     display: flex;
     //flex-direction: row;
-    width: 100%;
+    min-width: 100%;
+    width: min-content;
     height: 100%;
     justify-content: space-between;
     //overflow: hidden;
     padding: 0 5px;
     .el-container {
-      margin: 0 -5px;
+      //margin: 0 -5px;
       background-color: #fff;
-      //border-radius: 50%;
+      border-radius: 50%;
       align-self: center;
-      transition: transform 0.5s;
-      width: 50px;
-      height: 50px;
+      transition: all 0.5s;
+      //width: 50px;
+      //height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
+      //min-width: 20%;
+      min-width: 50px;
+      min-height: 55%;
       &.activated {
         z-index:20;
+        //min-width: 25%;
+        //min-width: 62px;
+        //min-height: 70%;
         background-color: yellowgreen;
         i {
           //font-size: 2.5rem;
+          font-size: 16px;
           filter: none;
         }
       }
       i {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         filter: blur(2px);
-        //border:1px solid red;
-        //border-radius: 50%;
-        //font-size: 1.5rem;
-        //padding: 10px;
-        transition: font-size 0.5s;
+        transition: all 0.5s;
+        font-size: 16px;
       }
     }
   }
