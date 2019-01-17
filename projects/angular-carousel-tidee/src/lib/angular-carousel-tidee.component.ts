@@ -19,16 +19,19 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
   // @todo remove magic numbers
   viewCount = 7;
   middleNum = 4;
-  leftShift = 0;
+  shiftX = 0;
+  shiftY = 0;
   subscription: Subscription;
   elementWidth = 150;
   elementBaseHeight = 55;
-  elementMargin = -5;
+  elementMarginX = -5;
+  elementMarginY = -5;
   frameNumber = 0;
   middleX = 0;
   magicMargin = 35;
 
   ELEMENT_WIDTH = 50;
+  ELEMENT_HEIGHT = 50;
 
   constructor(public carouselService: AngularCarouselTideeService) {
     this.carouselService.prevClick$.subscribe(item => this.prevClick());
@@ -42,7 +45,10 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
     console.log(this.direction);
     // this.elementWidth = this.carouselMain.nativeElement.clientWidth / this.countPerFrame;
     this.elementWidth = 1 / this.countPerFrame * 100;
-    this.elementMargin = Math.floor(this.carouselMain.nativeElement.clientWidth / this.countPerFrame) - this.ELEMENT_WIDTH;
+    this.elementMarginX = (this.direction === 'row') ?
+      Math.floor(this.carouselMain.nativeElement.clientWidth / this.countPerFrame) - this.ELEMENT_WIDTH : 0;
+    this.elementMarginY = (this.direction === 'column') ?
+      Math.floor(this.carouselMain.nativeElement.clientHeight / this.countPerFrame) - this.ELEMENT_HEIGHT : 0;
     this.middleX = Math.floor(this.carouselMain.nativeElement.clientWidth / 2);
     console.log(this.middleX);
     console.log(this.elementWidth);
@@ -59,7 +65,7 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
     console.log(w);
     console.log(this.carouselMain.nativeElement.clientWidth / this.countPerFrame);
     console.log(this.carouselMain.nativeElement.clientWidth);
-    console.log(this.elementMargin);
+    console.log(this.elementMarginX);
     console.log(this.elements);
     // this.elementWidth = this.carouselMain.nativeElement.clientWidth / this.countPerFrame;
     // (w as any as Array<HTMLElement>).forEach(temp => temp.style.width = `${this.elementWidth}px`);
@@ -74,15 +80,15 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
     if (num - 2 > 0 && num + 4 < this.elements.length) {
       // const tempEl = Array.from(document.querySelectorAll('.el-container'));
       const tempEl = document.querySelectorAll('.el-container');
-      console.log(this.leftShift);
-      this.leftShift += 45 * this.detectDirection(num);
-      console.log(this.leftShift);
+      console.log(this.shiftX);
+      this.shiftX += 45 * this.detectDirection(num);
+      console.log(this.shiftX);
       console.log(tempEl.length);
 
       // remove error:
       // Property 'forEach' does not exist on type 'NodeListOf<Element>'
-      // (tempEl as any as Array<HTMLElement>).forEach(temp => temp.style.transform = `translate(${this.leftShift}px)`);
-      this.carouselMain.nativeElement.style.transform = `translateX(${this.leftShift}px)`;
+      // (tempEl as any as Array<HTMLElement>).forEach(temp => temp.style.transform = `translate(${this.shiftX}px)`);
+      this.carouselMain.nativeElement.style.transform = `translateX(${this.shiftX}px)`;
     }
 
     this.getTranslateElement(q);
@@ -119,9 +125,15 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
     const activeNum = this.elements.findIndex(element => element.activated);
     if (activeNum + 1 < this.elements.length) {
       this.changeActiveElement(activeNum, 1);
-      if (activeNum - Math.floor(this.frameNumber / 2) > 0) {
-        this.leftShift = -Math.floor(this.ELEMENT_WIDTH + this.elementMargin) * activeNum + this.magicMargin;
-        this.carouselMain.nativeElement.style.transform = `translateX(${this.leftShift}px)`;
+        if (activeNum - Math.floor(this.countPerFrame / 2) + 1 > 0
+          && activeNum + Math.floor(this.countPerFrame / 2) < this.elements.length) {
+          if (this.direction === 'row') {
+            this.shiftX = -Math.floor(this.ELEMENT_WIDTH + this.elementMarginX) * activeNum + this.magicMargin;
+            this.carouselMain.nativeElement.style.transform = `translateX(${this.shiftX}px)`;
+          } else {
+            this.shiftY = -Math.floor(this.ELEMENT_HEIGHT + this.elementMarginY) * activeNum + this.magicMargin;
+            this.carouselMain.nativeElement.style.transform = `translateY(${this.shiftY}px)`;
+        }
       }
     }
   }
@@ -130,14 +142,16 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
     const activeNum = this.elements.findIndex(element => element.activated);
     if (activeNum > 0) {
       this.changeActiveElement(activeNum, -1);
-      if (activeNum + Math.floor(this.frameNumber / 2) < this.elements.length - 1) {
-        this.leftShift = -Math.floor(this.ELEMENT_WIDTH + this.elementMargin) * (activeNum - 1) + this.magicMargin;
-        this.carouselMain.nativeElement.style.transform = `translateX(${this.leftShift}px)`;
+      if (activeNum + Math.floor(this.countPerFrame / 2) < this.elements.length + 1) {
+        if (this.direction === 'row') {
+          this.shiftX = -Math.floor(this.ELEMENT_WIDTH + this.elementMarginX) * (activeNum - 1) + this.magicMargin;
+          this.carouselMain.nativeElement.style.transform = `translateX(${this.shiftX}px)`;
+        } else {
+          this.shiftY = -Math.floor(this.ELEMENT_HEIGHT + this.elementMarginY) * (activeNum - 1) + this.magicMargin;
+          this.carouselMain.nativeElement.style.transform = `translateY(${this.shiftY}px)`;
+        }
       }
     }
-    // this.elements = this.elements.map((x, i) => {
-    //   x.visible = (this.frameNumber + i < this.countPerFrame) && (i > this.frameNumber) ;
-    // });
   }
 
   changeActiveElement(num: number, direction: number): void {
@@ -149,6 +163,12 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
     console.log(el.style.transform);
     // console.log(el.style.transform.split('translate(')[1]);
     // q.split('(')[1].split('px')[1].split(' ')[1]
+  }
+
+  setClass(el) {
+    let elementClass = el.activated ? 'activated' : '';
+    elementClass += this.direction === 'column' ? ' column-elements' : '';
+    return elementClass;
   }
 }
 

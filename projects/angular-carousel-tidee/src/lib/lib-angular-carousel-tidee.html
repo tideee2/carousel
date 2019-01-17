@@ -1,9 +1,10 @@
 <div class="carousel-container">
   <div class="carousel-main" #carouselMain [ngStyle]="{'flex-direction': direction}">
     <div class="el-container" *ngFor="let el of elements; let num = index" (click)="elClick(el, num, singleElement)"
-         [ngClass]="el.activated ? 'activated' : ''"
+         [ngClass]="setClass(el)"
          [ngStyle]="{'filter': 'brightness(' + findOpacity(num)*100 + '%)'}"
-         [style.marginRight.px]="elementMargin"
+         [style.marginRight.px]="elementMarginX"
+         [style.marginBottom.px]="elementMarginY"
          [style.visibility]="el.visible ? 'visible' : 'hidden'"
          [style.zIndex]="findPosition(num)" data-id="{{el.id}}" #singleElement>
       <i class="fa" [ngClass]="el.icon" aria-hidden="true"></i>

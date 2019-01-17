@@ -28,6 +28,10 @@
       //min-width: 20%;
       min-width: 50px;
       min-height: 55%;
+      &.column-elements {
+        min-width: 55%;
+        min-height: 50px;
+      }
       &.activated {
         z-index:20;
         //min-width: 25%;
