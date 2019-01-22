@@ -11,7 +11,7 @@ export class AppComponent {
   title = 'angular-carousel-tideee';
   entryArray = ELEMENTS;
   carouselDirection = 'row';
-  countPerFrame = 7;
+  countPerFrame = 5;
 
   constructor(public carouselService: AngularCarouselTideeService) {
     console.log(this.title);

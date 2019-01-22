@@ -39,7 +39,7 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.subscription = this.carouselService.navItemNext$.subscribe(item => (item === 1) ? this.nextClick() : this.prevClick());
+    this.subscription = this.carouselService.navItemNext$.subscribe(item => (item === 1) ? this.nextClick(1) : this.prevClick(1));
     // this.subscription = this.carouselService.navItemPrev$.subscribe(() => this.prevClick());
     console.log(this.getCenter());
     console.log(this.direction);
@@ -121,37 +121,52 @@ export class AngularCarouselTideeComponent implements OnInit, AfterViewInit {
     return this.elements.findIndex(x => x.activated === true) - num;
   }
 
-  nextClick() {
+  nextClick(step?: number) {
+    step = step || 1;
     const activeNum = this.elements.findIndex(element => element.activated);
-    if (activeNum + 1 < this.elements.length) {
-      this.changeActiveElement(activeNum, 1);
-        if (activeNum - Math.floor(this.countPerFrame / 2) + 1 > 0
-          && activeNum + Math.floor(this.countPerFrame / 2) < this.elements.length) {
-          if (this.direction === 'row') {
-            this.shiftX = -Math.floor(this.ELEMENT_WIDTH + this.elementMarginX) * activeNum + this.magicMargin;
-            this.carouselMain.nativeElement.style.transform = `translateX(${this.shiftX}px)`;
-          } else {
-            this.shiftY = -Math.floor(this.ELEMENT_HEIGHT + this.elementMarginY) * activeNum + this.magicMargin;
-            this.carouselMain.nativeElement.style.transform = `translateY(${this.shiftY}px)`;
+    const moveCount = activeNum + step;
+    if (moveCount < this.elements.length) {
+      this.changeActiveElement(activeNum, step);
+    } else {
+      this.changeActiveElement(activeNum, this.elements.length - activeNum - 1);
+    }
+
+    if (activeNum - Math.floor(this.countPerFrame / 2) + step > 0
+      && activeNum + Math.floor(this.countPerFrame / 2) < this.elements.length) {
+      if (this.direction === 'row') {
+        this.shiftX = -Math.floor(this.ELEMENT_WIDTH + this.elementMarginX) * (moveCount - this.countPerFrame / 2 + 1) + this.magicMargin;
+        this.carouselMain.nativeElement.style.transform = `translateX(${this.shiftX}px)`;
+      } else {
+        this.shiftY = -Math.floor(this.ELEMENT_HEIGHT + this.elementMarginY) * (moveCount - this.countPerFrame / 2 + 1) + this.magicMargin;
+        this.carouselMain.nativeElement.style.transform = `translateY(${this.shiftY}px)`;
+      }
+    }
+
+  }
+
+  prevClick(step?: number) {
+    step = step || 1;
+    const activeNum = this.elements.findIndex(element => element.activated);
+    const moveCount = activeNum - step;
+    console.log(moveCount, ' : ', step, ' : ', activeNum);
+    if (moveCount >= 0) {
+      this.changeActiveElement(activeNum, (-1) * step);
+      // }
+      if (activeNum + Math.floor(this.countPerFrame / 2) + step < this.elements.length
+        && Math.floor(this.countPerFrame / 2) - moveCount <= activeNum + 1) {
+        if (this.direction === 'row') {
+          this.shiftX = -Math.floor(this.ELEMENT_WIDTH + this.elementMarginX) * (moveCount - this.countPerFrame / 2 + 1) + this.magicMargin;
+          this.carouselMain.nativeElement.style.transform = `translateX(${this.shiftX}px)`;
+        } else {
+          this.shiftY = -Math.floor(this.ELEMENT_HEIGHT + this.elementMarginY) * (moveCount - this.countPerFrame / 2 + 1) + this.magicMargin;
+          this.carouselMain.nativeElement.style.transform = `translateY(${this.shiftY}px)`;
         }
       }
     }
   }
 
-  prevClick() {
-    const activeNum = this.elements.findIndex(element => element.activated);
-    if (activeNum > 0) {
-      this.changeActiveElement(activeNum, -1);
-      if (activeNum + Math.floor(this.countPerFrame / 2) < this.elements.length + 1) {
-        if (this.direction === 'row') {
-          this.shiftX = -Math.floor(this.ELEMENT_WIDTH + this.elementMarginX) * (activeNum - 1) + this.magicMargin;
-          this.carouselMain.nativeElement.style.transform = `translateX(${this.shiftX}px)`;
-        } else {
-          this.shiftY = -Math.floor(this.ELEMENT_HEIGHT + this.elementMarginY) * (activeNum - 1) + this.magicMargin;
-          this.carouselMain.nativeElement.style.transform = `translateY(${this.shiftY}px)`;
-        }
-      }
-    }
+  moveActive(num: number) {
+
   }
 
   changeActiveElement(num: number, direction: number): void {
